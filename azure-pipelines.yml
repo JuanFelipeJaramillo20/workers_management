@@ -15,9 +15,8 @@ steps:
     dockerComposeFile: '**/docker-compose.test.yml'
     action: 'Run services'
     detached: true
-  displayName: 'Start Test Environment'
 
-# Step 2: Wait for services to be healthy
+# Step 2: Wait for the app service to be healthy
 - script: |
     echo "Waiting for app service to be healthy..."
     max_retries=30
