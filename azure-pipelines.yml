@@ -17,27 +17,28 @@ steps:
     detached: true
   displayName: 'Start Test Environment'
 
-# Step 2: Wait for the app service to be healthy using PowerShell
-- powershell: |
-    Write-Host "Waiting for app service to be healthy..."
-    $maxRetries = 30
-    $retryCount = 0
-    $healthy = $false
-    while ($retryCount -lt $maxRetries -and -not $healthy) {
-        $healthStatus = docker-compose -f docker-compose.test.yml exec app curl -s http://localhost:8080/actuator/health | ConvertFrom-Json
-        if ($healthStatus.status -eq 'UP') {
-            $healthy = $true
-            Write-Host "App service is healthy."
-        } else {
-            Write-Host "Waiting for app service to start..."
-            Start-Sleep -Seconds 10
-            $retryCount++
-        }
-    }
-    if (-not $healthy) {
-        Write-Error "App service failed to start within the expected time."
-        exit 1
-    }
+# Step 2: Wait for services to be healthy
+- script: |
+    echo "Waiting for app service to be healthy..."
+    max_retries=30
+    retry_count=0
+    healthy=false
+    while [ $retry_count -lt $max_retries ]; do
+      status=$(docker-compose -f docker-compose.test.yml exec app curl -s http://localhost:8080/actuator/health | jq -r '.status')
+      if [ "$status" == "UP" ]; then
+        healthy=true
+        echo "App service is healthy."
+        break
+      else
+        echo "Waiting for app service to start..."
+        sleep 10
+        retry_count=$((retry_count + 1))
+      fi
+    done
+    if [ "$healthy" == "false" ]; then
+      echo "App service failed to start within the expected time."
+      exit 1
+    fi
   displayName: 'Wait for app service to be healthy'
 
 # Step 3: Run tests inside the test containers
