@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Task Details</title>
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+</head>
+<body>
+<h1>Task Details</h1>
+<div>
+    <p><strong>ID:</strong> <span th:text="${task.id}"></span></p>
+    <p><strong>Description:</strong> <span th:text="${task.description}"></span></p>
+    <p><strong>Status:</strong> <span th:text="${task.status}"></span></p>
+    <p><strong>Employee:</strong> <span th:text="${task.employee.name}"></span></p>
+</div>
+<div>
+    <a th:href="@{/tasks}">Back to List</a>
+    <a th:href="@{/tasks/{id}/delete(id=${task.id})}">Delete</a>
+</div>
+</body>
+</html>

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Employee Details</title>
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+</head>
+<body>
+<h1>Employee Details</h1>
+<div>
+    <p><strong>ID:</strong> <span th:text="${employee.id}"></span></p>
+    <p><strong>Name:</strong> <span th:text="${employee.name}"></span></p>
+    <p><strong>Position:</strong> <span th:text="${employee.position}"></span></p>
+    <p><strong>Department:</strong> <span th:text="${employee.department}"></span></p>
+</div>
+<div>
+    <a th:href="@{/employees}">Back to List</a>
+    <a th:href="@{/employees/{id}/delete(id=${employee.id})}">Delete</a>
+</div>
+</body>
+</html>

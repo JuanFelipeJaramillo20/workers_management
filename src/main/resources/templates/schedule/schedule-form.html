@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Create Schedule</title>
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+</head>
+<body>
+<h1>Create New Schedule</h1>
+<form th:action="@{/schedules}" th:object="${schedule}" method="post">
+    <div>
+        <label for="date">Date:</label>
+        <input type="date" id="date" th:field="*{date}" required>
+    </div>
+    <div>
+        <label for="shift">Shift:</label>
+        <input type="text" id="shift" th:field="*{shift}" required>
+    </div>
+    <div>
+        <label for="employee">Employee:</label>
+        <select id="employee" th:field="*{employee.id}" required>
+            <option th:each="employee : ${employees}" th:value="${employee.id}" th:text="${employee.name}"></option>
+        </select>
+    </div>
+    <div>
+        <button type="submit">Save</button>
+        <a th:href="@{/schedules}">Cancel</a>
+    </div>
+</form>
+</body>
+</html>

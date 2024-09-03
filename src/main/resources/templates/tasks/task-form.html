@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Create Task</title>
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+</head>
+<body>
+<h1>Create New Task</h1>
+<form th:action="@{/tasks}" th:object="${task}" method="post">
+    <div>
+        <label for="description">Description:</label>
+        <input type="text" id="description" th:field="*{description}" required>
+    </div>
+    <div>
+        <label for="status">Status:</label>
+        <input type="text" id="status" th:field="*{status}" required>
+    </div>
+    <div>
+        <label for="employee">Employee:</label>
+        <select id="employee" th:field="*{employee.id}" required>
+            <option th:each="employee : ${employees}" th:value="${employee.id}" th:text="${employee.name}"></option>
+        </select>
+    </div>
+    <div>
+        <button type="submit">Save</button>
+        <a th:href="@{/tasks}">Cancel</a>
+    </div>
+</form>
+</body>
+</html>
