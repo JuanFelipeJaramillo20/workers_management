@@ -1,5 +1,7 @@
 FROM maven:3.9.9-amazoncorretto-17-al2023 AS builder
 
+RUN apt-get update && apt-get install -y jq
+
 WORKDIR /app
 
 COPY pom.xml .
