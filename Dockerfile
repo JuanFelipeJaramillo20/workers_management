@@ -2,7 +2,7 @@
 FROM maven:3.9.9-amazoncorretto-17-al2023 AS builder
 
 # Install jq for JSON parsing
-RUN apt-get update && apt-get install -y jq
+RUN dnf update -y && dnf install -y jq
 
 WORKDIR /app
 
