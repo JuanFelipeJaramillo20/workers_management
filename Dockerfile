@@ -1,5 +1,7 @@
+# Build Stage
 FROM maven:3.9.9-amazoncorretto-17-al2023 AS builder
 
+# Install jq for JSON parsing
 RUN apt-get update && apt-get install -y jq
 
 WORKDIR /app
@@ -9,7 +11,8 @@ COPY src ./src
 
 RUN mvn clean package -DskipTests
 
-FROM eclipse-temurin:21-jdk-alpine
+# Final Stage
+FROM amazoncorretto:17-alpine
 
 WORKDIR /app
 
