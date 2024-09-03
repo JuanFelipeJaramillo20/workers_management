@@ -22,18 +22,19 @@ steps:
     targetType: 'inline'
     script: |
       Write-Host "Waiting for app service to be healthy..."
-      $max_retries = 30
+      $max_retries = 50  # Increased retries
       $retry_count = 0
       $healthy = $false
       while ($retry_count -lt $max_retries) {
-        $status = docker-compose -f docker-compose.test.yml exec -T app curl -s http://localhost:8080/actuator/health | ConvertFrom-Json | Select-Object -ExpandProperty status
+        $status = docker-compose -f docker-compose.test.yml exec -T app curl -s http://app:8080/actuator/health | ConvertFrom-Json | Select-Object -ExpandProperty status
+        Write-Host "Current status: $status"
         if ($status -eq "UP") {
           $healthy = $true
           Write-Host "App service is healthy."
           break
         } else {
-          Write-Host "Waiting for app service to start..."
-          Start-Sleep -Seconds 10
+          Write-Host "Waiting for app service to start... Attempt $($retry_count + 1)/$max_retries"
+          Start-Sleep -Seconds 15  # Increased sleep time
           $retry_count++
         }
       }
