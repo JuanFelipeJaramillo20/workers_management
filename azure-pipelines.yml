@@ -1,0 +1,35 @@
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+# Step 1: Build and run the test environment using docker-compose.test.yml
+- task: DockerCompose@0
+  inputs:
+    containerregistrytype: 'None'
+    dockerComposeFile: '**/docker-compose.test.yml'
+    action: 'Run services'
+    detached: true
+
+# Step 2: Run tests inside the test containers
+- script: |
+    # Ensure services are up and healthy before running tests
+    docker-compose -f docker-compose.test.yml exec app ./mvnw test
+  displayName: 'Run Integration and Unit Tests'
+
+# Step 3: Tear down the test environment after tests are complete
+- script: |
+    docker-compose -f docker-compose.test.yml down
+  displayName: 'Tear down test environment'
+
+# Step 4: Conditional deployment if tests are successful
+- task: DockerCompose@0
+  condition: succeeded()
+  inputs:
+    containerregistrytype: 'None'
+    dockerComposeFile: '**/docker-compose.yml'
+    action: 'Run services'
+    detached: true
+  displayName: 'Deploy Production Services'
