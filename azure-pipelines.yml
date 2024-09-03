@@ -26,7 +26,7 @@ steps:
       $retry_count = 0
       $healthy = $false
       while ($retry_count -lt $max_retries) {
-        $status = docker-compose -f docker-compose.test.yml exec -T app curl -s http://app:8080/actuator/health | ConvertFrom-Json | Select-Object -ExpandProperty status
+        $status = docker-compose -f docker-compose.test.yml exec -T worker_management-app-1 curl -s http://worker_management-app-1:8080/actuator/health | ConvertFrom-Json | Select-Object -ExpandProperty status
         Write-Host "Current status: $status"
         if ($status -eq "UP") {
           $healthy = $true
@@ -49,7 +49,7 @@ steps:
   inputs:
     targetType: 'inline'
     script: |
-      docker-compose -f docker-compose.test.yml exec -T app ./mvnw test
+      docker-compose -f docker-compose.test.yml exec -T worker_management-app-1 ./mvnw test
   displayName: 'Run Integration and Unit Tests'
 
 # Step 4: Tear down the test environment after tests are complete
