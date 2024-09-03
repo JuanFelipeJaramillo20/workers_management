@@ -16,18 +16,26 @@ steps:
     action: 'Run services'
     detached: true
 
-# Step 2: Run tests inside the test containers
+# Step 2: Wait for the app service to be healthy
 - script: |
-    # Ensure services are up and healthy before running tests
+    echo "Waiting for app service to be healthy..."
+    while ! docker-compose -f docker-compose.test.yml exec app curl -s http://localhost:8080/actuator/health | grep '"status":"UP"'; do
+      echo "Waiting for app service to start..."
+      sleep 5
+    done
+  displayName: 'Wait for app service to be healthy'
+
+# Step 3: Run tests inside the test containers
+- script: |
     docker-compose -f docker-compose.test.yml exec app ./mvnw test
   displayName: 'Run Integration and Unit Tests'
 
-# Step 3: Tear down the test environment after tests are complete
+# Step 4: Tear down the test environment after tests are complete
 - script: |
     docker-compose -f docker-compose.test.yml down
   displayName: 'Tear down test environment'
 
-# Step 4: Conditional deployment if tests are successful
+# Step 5: Conditional deployment if tests are successful
 - task: DockerCompose@0
   condition: succeeded()
   inputs:
