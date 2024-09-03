@@ -2,21 +2,47 @@ trigger:
 - main
 
 pool:
-  vmImage: windows-latest
   name: local
   demands:
     - agent.name -equals DESKTOP-5CLOM36
 
 steps:
 # Step 1: Build and run the test environment using docker-compose.test.yml
-- task: DockerCompose@0
+- task: DockerCompose@1
   inputs:
-    containerregistrytype: 'None'
+    containerregistrytype: 'Container Registry'
     dockerComposeFile: '**/docker-compose.test.yml'
     action: 'Run services'
     detached: true
+  displayName: 'Build and Run Test Environment'
 
-
+# Step 2: Wait for the app service to be healthy
+- task: PowerShell@2
+  inputs:
+    targetType: 'inline'
+    script: |
+      Write-Host "Waiting for app service to be healthy..."
+      $max_retries = 50
+      $retry_count = 0
+      $healthy = $false
+      while ($retry_count -lt $max_retries) {
+        $status = docker-compose -f docker-compose.test.yml exec -T app curl -s http://app:8080/actuator/health | ConvertFrom-Json | Select-Object -ExpandProperty status
+        Write-Host "Current status: $status"
+        if ($status -eq "UP") {
+          $healthy = $true
+          Write-Host "App service is healthy."
+          break
+        } else {
+          Write-Host "Waiting for app service to start... Attempt $($retry_count + 1)/$max_retries"
+          Start-Sleep -Seconds 15
+          $retry_count++
+        }
+      }
+      if (-not $healthy) {
+        Write-Host "App service failed to start within the expected time."
+        exit 1
+      }
+  displayName: 'Wait for app service to be healthy'
 
 # Step 3: Run tests inside the test containers
 - task: PowerShell@2
@@ -35,10 +61,10 @@ steps:
   displayName: 'Tear down test environment'
 
 # Step 5: Conditional deployment if tests are successful
-- task: DockerCompose@0
+- task: DockerCompose@1
   condition: succeeded()
   inputs:
-    containerregistrytype: 'None'
+    containerregistrytype: 'Container Registry'
     dockerComposeFile: '**/docker-compose.yml'
     action: 'Run services'
     detached: true
