@@ -10,7 +10,7 @@ pool:
   vmImage: ubuntu-latest
   name: local
   demands:
-    - agent.name -equals DESKTOP-5CLOM36
+    - agent.name -equals tauret
 
 steps:
 - task: Maven@3
