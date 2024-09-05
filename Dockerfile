@@ -12,10 +12,10 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # Final Stage
-FROM amazoncorretto:17-alpine
+FROM openjdk
 
 WORKDIR /app
 
 COPY --from=builder /app/target/worker-management-app.jar app.jar
-
+EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
