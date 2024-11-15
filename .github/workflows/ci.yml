@@ -1,0 +1,19 @@
+name: CI Workflow
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Run Maven Build
+        uses: CI-CD-assistant//maven-build-action@v0.1
+        with:
+          project_path: "../../"  # Specify the path to the Maven project
