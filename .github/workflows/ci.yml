@@ -7,13 +7,19 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
+  build-and-test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
       - name: Run Maven Build
-        uses: CI-CD-assistant//maven-build-action@V0.2
+        uses: CI-CD-assistant/maven-build-action@v0.2
         with:
-          project_path: "./"  # Specify the path to the Maven project
+          project_path: "./"
+
+      - name: Run Tests
+        uses: CI-CD-assistant/run-tests-action@v0.1
+        with:
+          project_type: "maven"
+          project_path: "./"
