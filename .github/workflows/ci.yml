@@ -14,12 +14,12 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Run Maven Build
-        uses: CI-CD-assistant/maven-build-action@v0.2
+        uses: CI-CD-assistant/maven-build-action@V0.2
         with:
           project_path: "./"
 
       - name: Run Tests
-        uses: CI-CD-assistant/run-tests-action@v0.1
+        uses: CI-CD-assistant/run-tests-action@V0.1
         with:
           project_type: "maven"
           project_path: "./"
