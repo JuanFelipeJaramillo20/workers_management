@@ -16,4 +16,4 @@ jobs:
       - name: Run Maven Build
         uses: CI-CD-assistant//maven-build-action@V0.1
         with:
-          project_path: "../../"  # Specify the path to the Maven project
+          project_path: "./"  # Specify the path to the Maven project
