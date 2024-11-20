@@ -23,3 +23,13 @@ jobs:
         with:
           project_type: "maven"
           project_path: "./"
+
+ # Step 3: SonarQube Analysis
+      - name: SonarQube Analysis
+        uses: CI-CD-assistant/sonarqube-analysis-action@v0.1
+        with:
+          project_key: "my-Java-web-app"
+          organization: "my-org"
+          host_url: ${{ secrets.SONAR_HOST_URL }}
+          login_token: ${{ secrets.SONAR_TOKEN }}
+          project_path: "./"
