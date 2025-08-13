@@ -1,54 +1,52 @@
 package com.tg1.tg1.Employee;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
-public class EmployeeControllerIntegrationTest {
+@Testcontainers
+class EmployeeControllerIntegrationTest {
 
-    private static MySQLContainer<?> mysqlContainer = new MySQLContainer<>("mysql:9.4");
+    private static final DockerImageName MYSQL_IMAGE =
+            DockerImageName.parse("mysql:8.4.0")
+                    .asCompatibleSubstituteFor("mysql");
 
-    @LocalServerPort
-    private int port;
+    @Container
+    static MySQLContainer<?> mysql = new MySQLContainer<>(MYSQL_IMAGE)
+            .withReuse(false);
+
+    @DynamicPropertySource
+    static void registerProps(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", mysql::getJdbcUrl);
+        registry.add("spring.datasource.username", mysql::getUsername);
+        registry.add("spring.datasource.password", mysql::getPassword);
+        registry.add("spring.jpa.hibernate.ddl-auto", () -> "none");
+        registry.add("spring.datasource.driver-class-name", () -> "com.mysql.cj.jdbc.Driver");
+    }
 
     @Autowired
     private MockMvc mockMvc;
 
-    private TestRestTemplate restTemplate = new TestRestTemplate();
-
-    @BeforeAll
-    public static void setUp() {
-        mysqlContainer.start();
-        System.setProperty("spring.datasource.url", mysqlContainer.getJdbcUrl());
-        System.setProperty("spring.datasource.username", mysqlContainer.getUsername());
-        System.setProperty("spring.datasource.password", mysqlContainer.getPassword());
-    }
-
-    @AfterAll
-    public static void tearDown() {
-        mysqlContainer.stop();
-    }
-
     @Test
     @Sql("/test-data.sql")
-    public void testListEmployees() throws Exception {
+    void testListEmployees() throws Exception {
         mockMvc.perform(get("/employees"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("text/html;charset=UTF-8"))
