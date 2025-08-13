@@ -1,0 +1,35 @@
+{
+  "family": "java-workers-task",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "1024",
+  "memory": "3072",
+  "executionRoleArn": "arn:aws:iam::767397754554:role/ecsTaskExecutionRole",
+  "containerDefinitions": [
+    {
+      "name": "cdcicontainer",
+      "image": "767397754554.dkr.ecr.us-east-1.amazonaws.com/tg1/java_workers:latest",
+      "essential": true,
+      "portMappings": [
+        {
+          "name": "cdcicontainer-8080-tcp",
+          "containerPort": 8080,
+          "hostPort": 8080,
+          "protocol": "tcp",
+          "appProtocol": "http"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/java_workers_task",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "environment": [
+        { "name": "SPRING_PROFILES_ACTIVE", "value": "prod" }
+      ]
+    }
+  ]
+}
