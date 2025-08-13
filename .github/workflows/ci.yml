@@ -1,13 +1,13 @@
 name: CI Workflow
 
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    push:
+        branches:
+          - main
 
 jobs:
   build-and-test:
+    name: Build and Test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -21,15 +21,27 @@ jobs:
       - name: Run Tests
         uses: CI-CD-assistant/run-tests-action@V0.1
         with:
-          project_type: "maven"
+          project_type: "Maven"
           project_path: "./"
+        continue-on-error: false
 
- # Step 3: SonarQube Analysis
-      - name: SonarQube Analysis
-        uses: CI-CD-assistant/sonarqube-analysis-action@V0.1
+  deploy:
+    name: Deploy Job
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    steps:
+      - name: Setup AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
         with:
-          project_key: "my-Java-web-app"
-          organization: "my-org"
-          host_url: ${{ secrets.SONAR_HOST_URL }}
-          login_token: ${{ secrets.SONAR_TOKEN }}
-          project_path: "./"
+          aws-access-key-id: YOUR_AWS_ACCESS_KEY_ID
+          aws-secret-access-key: YOUR_AWS_SECRET_ACCESS_KEY
+          aws-region: us-east-1
+      - name: Deploy to ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: path/to/task-definition.json
+          service: my-ecs-service
+          cluster: my-ecs-cluster
+      - name: Log deployment result
+        run: echo "Deployment completed successfully for AWS - ContainerizedAppECS"
+        continue-on-error: false
