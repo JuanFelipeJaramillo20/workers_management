@@ -23,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class EmployeeControllerIntegrationTest {
 
-    private static MySQLContainer<?> mysqlContainer = new MySQLContainer<>("mysql:latest");
+    private static MySQLContainer<?> mysqlContainer = new MySQLContainer<>("mysql:9.4");
 
     @LocalServerPort
     private int port;
