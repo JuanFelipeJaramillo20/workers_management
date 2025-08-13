@@ -21,7 +21,7 @@ jobs:
       - name: Run Tests
         uses: CI-CD-assistant/run-tests-action@V0.1
         with:
-          project_type: "Maven"
+          project_type: "maven"
           project_path: "./"
         continue-on-error: false
 
